@@ -1,3 +1,7 @@
+/*
+Boggle implements a trie to store all the words in the dictionary, and then conducts depth first search on that trie when
+trying to find words from the Boggle grid.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -21,6 +25,7 @@ long COLS;
 bool CFLAG = false;
 bool TFLAG = false;
 
+// trim the new line character at the end of each word
 void trim(char *s)
 {
     char *index;
@@ -30,6 +35,7 @@ void trim(char *s)
     }
 }
 
+// prints out all words found in the Boggle grid to standard output; if -c flag is specified, then print all words NOT found
 void printWords(Trie *t, char **word, int size)
 {
     for (int i = 0; i < 26; i++)
@@ -82,6 +88,9 @@ void printWords(Trie *t, char **word, int size)
     }
 }
 
+// iterates through the Boggle board, forming new "words" and then testing these words on the trie; if the addition of a new letter
+// leads to a null trie, then don't add that letter and find another letter to add.
+// if -t flag is specified, then each letter in the grid can be used only once.
 void checkWord(Trie *t, int row, int col, char grid[ROWS][COLS], bool seen[ROWS][COLS])
 {
     for (int dx = ((col > 0)? -1 : 0); dx <= ((col < (COLS - 1))? 1 : 0); dx++)
@@ -129,6 +138,7 @@ void checkWord(Trie *t, int row, int col, char grid[ROWS][COLS], bool seen[ROWS]
     }
 }
 
+// insert the char *word into the trie t
 void insertWord(Trie *t, char* word)
 {
     char c = word[0];
@@ -177,6 +187,7 @@ void insertWord(Trie *t, char* word)
 int main(int argc, char* argv[])
 {
     char *board;
+    // argument handling
     if (argc != 4 && argc != 5)
     {
         fprintf(stderr, "%s\n", "Boggle: usage: Boggle [-c] [-t] nRows nCols board");
@@ -277,7 +288,7 @@ int main(int argc, char* argv[])
     }
     
     
-    
+    // head is the head node of the trie
     head.count = 0;
     head.isWord = false;
     for (int i = 0; i < 26 ; i++)
@@ -285,6 +296,7 @@ int main(int argc, char* argv[])
         head.letters[i] = NULL;
     }
     
+    // add all words given by standard input to the trie
     char *inputString;
     inputString = getLine(stdin);
     while (inputString != NULL)
@@ -335,6 +347,7 @@ int main(int argc, char* argv[])
         }
     }
     
+    // first step in finding words in the Boggle grid; iterate through each index as potential starting point of word
     for (int i = 0; i < ROWS; i++)
     {
         for (int j = 0; j < COLS; j++)
